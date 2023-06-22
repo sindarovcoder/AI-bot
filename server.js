@@ -43,7 +43,7 @@ bot.on("message", (msg) => {
     );
   }
 
-  const API_KEY = `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`;
+  const API_KEY = `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`;
   const Data = {
     method: "POST",
     headers: {
