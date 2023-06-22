@@ -43,7 +43,7 @@ bot.on("message", (msg) => {
     );
   }
 
-  const API_KEY = `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`;
+  const API_KEY = `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`;
   const Data = {
     method: "POST",
     headers: {
@@ -65,6 +65,7 @@ bot.on("message", (msg) => {
     fetch("https://api.openai.com/v1/completions", Data)
       .then((response) => response.json())
       .then((response) => {
+        console.log(response);
         let messeng = response.choices[0].text.trim();
         return bot.sendMessage(chatId, messeng, {});
       });
