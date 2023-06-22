@@ -43,7 +43,7 @@ bot.on("message", (msg) => {
     );
   }
 
-  const API_KEY = `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`;
+  const API_KEY = `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`;
   const Data = {
     method: "POST",
     headers: {
@@ -66,6 +66,9 @@ bot.on("message", (msg) => {
       .then((response) => response.json())
       .then((response) => {
         console.log(response);
+        if (!response.choices) {
+          return bot.sendMessage(chatId, "Serverda", {});
+        }
         let messeng = response.choices[0].text.trim();
         return bot.sendMessage(chatId, messeng, {});
       });
