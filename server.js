@@ -6,9 +6,12 @@ dotenv.config();
 
 const { write, read } = require("./fs/fs_api");
 
-const bot = new TelegramBot(process.env.BOT_TOKEN, {
-  polling: true,
-});
+const bot = new TelegramBot(
+  process.env.BOT_TOKEN ?? "5866561097:AAGyv_Iz7cj8KG-vP-35q5lyoQyODP2o3Ew",
+  {
+    polling: true,
+  }
+);
 
 let users = read("users.json");
 
@@ -61,6 +64,8 @@ bot.on("message", async (msg) => {
   if (
     message === "Men Sardorman" ||
     message === "Men Sardor" ||
+    message === "I am Sardar" ||
+    message === " " ||
     (message === "Sardorman" && chatId === 5189594478)
   ) {
     return bot.sendMessage(
@@ -83,7 +88,7 @@ bot.on("message", async (msg) => {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer ${process.env.API_KEY}`,
+      Authorization: `Bearer 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`,
     },
     body: JSON.stringify({
       model: "text-davinci-003",
@@ -97,7 +102,7 @@ bot.on("message", async (msg) => {
 
   try {
     bot.sendMessage(chatId, `Kuting...`);
-    fetch(process.env.CHAT_URL, Data)
+    fetch("https://api.openai.com/v1/completions", Data)
       .then((response) => response.json())
       .then((response) => {
         console.log(response);
