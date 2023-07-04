@@ -61,19 +61,6 @@ bot.on("message", async (msg) => {
       parse_mode: "HTML",
     });
   }
-  if (
-    message === "Men Sardorman" ||
-    message === "Men Sardor" ||
-    message === "I am Sardar" ||
-    message === " " ||
-    (message === "Sardorman" && chatId === 5189594478)
-  ) {
-    return bot.sendMessage(
-      chatId,
-      "Assalomu alaykum keling Sardor aka sizni <i>tanimabman!</i>",
-      { parse_mode: "HTML" }
-    );
-  }
 
   if (message === "/2005_secret") {
     return bot.sendMessage(
