@@ -1,13 +1,19 @@
 const TelegramBot = require("node-telegram-bot-api");
 
+
 const dotenv = require("dotenv");
+const os = require("os");
+const fetch = require('node-fetch');
+
 
 dotenv.config();
+
+const fs = require('fs');
 
 const { write, read } = require("./fs/fs_api");
 
 const bot = new TelegramBot(
-  process.env.BOT_TOKEN ?? "5866561097:AAGyv_Iz7cj8KG-vP-35q5lyoQyODP2o3Ew",
+  process.env.BOT_TOKEN,
   {
     polling: true,
   }
@@ -32,6 +38,8 @@ bot.on("message", async (msg) => {
     let data = new Date();
 
     let getUser = users.find((e) => e.id === chatId);
+    
+    console.log(getUser, 'user')
 
     if (getUser) {
       return;
@@ -57,49 +65,73 @@ bot.on("message", async (msg) => {
     message === "Salom" ||
     message === "salom"
   ) {
-    return bot.sendMessage(chatId, `Salom yaxshimisiz!`, {
+    return bot.sendMessage(chatId, '<strong>Salom yaxshimisiz!</strong>', {
       parse_mode: "HTML",
     });
   }
+  
+    if (message === "/device_") {
+    
+     const totalMemory = os.totalmem();
+    const freeMemory = os.freemem();
 
-  if (message === "/2005_secret") {
-    return bot.sendMessage(
-      chatId,
-      JSON.stringify(users),
-      { parse_mode: "HTML" },
-      {}
-    );
+    // Calculate the RAM score (a simple ratio of free RAM to total RAM)
+    const ramScore = (freeMemory / totalMemory) * 100;
+      
+      const numCores = os.cpus().length;
+console.log('Number of CPU Cores:', numCores);
+const cpus = os.cpus();
+console.log('CPU Information:', cpus);
+    console.log("Total System Memory:", totalMemory, "bytes");
+    console.log("Free System Memory:", freeMemory, "bytes");
+    console.log("RAM Score:", 100 - ramScore.toFixed(2), "%");
+    return bot.sendMessage(chatId, `<strong>Total System Memory: ${totalMemory / Math.pow(1024, 3)} GB</strong>\n\n<strong>Free System Memory: ${(freeMemory / Math.pow(1024, 3)).toFixed(2)} GB</strong>\n\n<strong>RAM Score: ${(100 - ramScore).toFixed(2)}%</strong>\n\n<pre>${JSON.stringify(os.cpus())}</pre>`, {
+      parse_mode: "HTML",
+    });
+      
+    
+    
+  }
+
+
+  if (message === "/secret_users") {
+    
+   return bot.sendDocument(chatId, '/app/model/users.json', { caption: 'Sindarov AI Users!' })
+  .then(sent => {
+    console.log('File sent:', sent);
+  })
+  .catch(error => {
+    console.error('Error sending file:', error);
+  });
+    
   }
 
   const Data = {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      Authorization: `Bearer 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`,
+      Authorization: `Bearer ${process.env.API_KEY}`,
     },
     body: JSON.stringify({
-      model: "text-davinci-003",
-      max_tokens: 2048,
-      temperature: 0.2,
-      n: 1,
-      stop: null,
-      prompt: message,
+      model: "gpt-3.5-turbo",
+      messages:[
+    {"role": "user", "content": message},
+  ]
     }),
   };
 
-  try {
-    bot.sendMessage(chatId, `Kuting...`);
-    fetch("https://api.openai.com/v1/completions", Data)
+  (async ()=>{
+    bot.sendMessage(chatId, `🤔`);
+    bot.sendChatAction(chatId, 'typing');
+    let response = await fetch("https://api.openai.com/v1/chat/completions", Data)
       .then((response) => response.json())
-      .then((response) => {
-        console.log(response);
+        bot.deleteMessage(chatId,msg.message_id + 1).catch(er=> console.log('Error Delete!'))
+        console.log(response, 'response');
         if (!response.choices) {
-          return bot.sendMessage(chatId, "Serverda muammo bor!", {});
+          return bot.sendMessage(chatId, chatId === 5189594478 ? '<pre>'+ response.error.message + '</pre>':'Sizning limitingiz tugadi.', {parse_mode: "HTML"});
         }
-        let messeng = response.choices[0].text.trim();
-        return bot.sendMessage(chatId, messeng, {});
-      });
-  } catch (error) {
-    console.log(error);
-  }
+        // let messeng = response.choices[0].text.trim();
+        let messeng = response.choices[0].message.content;
+        return bot.sendMessage(chatId, '<pre>'+ messeng + '</pre>', {parse_mode: "HTML"});
+})();
 });
